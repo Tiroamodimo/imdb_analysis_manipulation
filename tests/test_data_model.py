@@ -1,13 +1,21 @@
+import duckdb
 import os
 import unittest
 
 import data_model
+
+db_fp = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'test.db')
 
 
 class TestDataModel(unittest.TestCase):
 
     def setUp(self) -> None:
         self.data_model = data_model.DataModel()
+        self.db_connection = duckdb.connect("test.db")
+
+    def tearDown(self) -> None:
+        self.db_connection.close()
+        os.remove("test.db")
 
     def test_given_valid_file_path_when_passed_to_get_query_return_expected_string(self):
         # arrange
@@ -29,21 +37,30 @@ class TestDataModel(unittest.TestCase):
         self.assertEqual(expected_result_2, result_2)
 
     def test_given_invalid_file_path_when_passed_to_get_query_return_empty_string(self):
+        # arrange
         file_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'test_resources', 'fake_file.sql')
         assert not os.path.exists(file_path)
 
         expected_result = ''
+
         # act
         result = self.data_model._get_query(file_path)
 
         # assert
         self.assertEqual(expected_result, result)
 
-    def given_valid_db_connection_when_passed_source_data_return_expected_tables(self):
-        self.assertEqual(True, False)
+    def test_given_valid_db_connection_when_passed_to_get_source_tables_return_expected_tables(self):
+        # arrange
+        expected_result = [('title_basics',), ('title_ratings',)]
 
-    def given_invalid_db_connection_when_passed_source_data_return_none(self):
-        self.assertEqual(True, False)
+        # act
+        self.data_model.get_source_tables(self.db_connection)
+        result = self.db_connection.execute("""
+        SELECT table_name FROM information_schema.tables WHERE table_type='BASE TABLE'
+        """).fetchall()
+
+        # assert
+        self.assertEqual(expected_result, result)
 
 
 if __name__ == '__main__':
