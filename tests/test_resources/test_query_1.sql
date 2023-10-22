@@ -1,0 +1,1 @@
+select * from NON_EXISTING_TABLE;
