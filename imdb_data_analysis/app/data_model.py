@@ -6,7 +6,7 @@ import duckdb.duckdb
 
 class DataModel:
     def __init__(self):
-        self.queries_dir = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'resources', 'queries')
+        self._queries_dir = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'resources', 'queries')
 
     @staticmethod
     def _get_query(file_path) -> str:
@@ -22,11 +22,11 @@ class DataModel:
         else:
             return query
 
-    def get_source_tables(self, db_connection):
+    def get_source_tables(self, db_connection, queries_dir: str):
 
-        load_extensions_query = self._get_query(os.path.join(self.queries_dir, 'load_db_extensions.sql'))
-        source_title_basics = self._get_query(os.path.join(self.queries_dir, 'source_title_basics.sql'))
-        source_title_ratings = self._get_query(os.path.join(self.queries_dir, 'source_title_ratings.sql'))
+        load_extensions_query = self._get_query(os.path.join(queries_dir, 'load_db_extensions.sql'))
+        source_title_basics = self._get_query(os.path.join(queries_dir, 'source_title_basics.sql'))
+        source_title_ratings = self._get_query(os.path.join(queries_dir, 'source_title_ratings.sql'))
 
         try:
             # ensure that the queries are not empty
@@ -45,3 +45,25 @@ class DataModel:
         # executing the queries fails
         except duckdb.duckdb.DuckDBError as err:
             logging.exception(err)
+
+    def get_top_movies(self, db_connection, queries_dir: str):
+        top_movies_query = self._get_query(os.path.join(queries_dir, 'transform_top_15_given_100_votes.sql'))
+
+        try:
+            # ensure that the query is not empty
+            assert top_movies_query != ''
+
+            # run the query
+            result = db_connection.execute(top_movies_query).fetchdf()
+
+        # if loading query fails
+        except AssertionError:
+            message = 'The query file is empty / does not exist. Please check existing queries in the queries folder and pass the correct file name.'
+            logging.exception(message)
+
+        # executing the query fails
+        except duckdb.duckdb.DuckDBError as err:
+            logging.exception(err)
+
+        else:
+            return result
