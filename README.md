@@ -60,6 +60,8 @@ The app fetches data from the IMDb datasets and calculates a ranking score for e
 formula `(numVotes / averageNumberOfVotes) * averageRating`. It then displays the top 15 movies based on this ranking
 score.
 
+![](repo_resources/app_planning_overview.png)
+
 ## Run Tests
 
 1. Download IMDb sample dataset. **NB! run from repo root directory.**
