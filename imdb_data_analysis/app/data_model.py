@@ -24,6 +24,7 @@ class DataModel:
 
     def get_source_tables(self, db_connection, queries_dir: str):
 
+        print('getting source tables ...')
         load_extensions_query = self._get_query(os.path.join(queries_dir, 'load_db_extensions.sql'))
         source_title_basics = self._get_query(os.path.join(queries_dir, 'source_title_basics.sql'))
         source_title_ratings = self._get_query(os.path.join(queries_dir, 'source_title_ratings.sql'))
@@ -42,11 +43,10 @@ class DataModel:
             message = 'The query file is empty / does not exist. Please check existing queries in the queries folder and pass the correct file name.'
             logging.exception(message)
 
-        # executing the queries fails
-        except duckdb.duckdb.DuckDBError as err:
-            logging.exception(err)
+        return self
 
     def get_top_movies(self, db_connection, queries_dir: str):
+        print('getting top movies ...')
         top_movies_query = self._get_query(os.path.join(queries_dir, 'transform_top_15_given_100_votes.sql'))
 
         try:
