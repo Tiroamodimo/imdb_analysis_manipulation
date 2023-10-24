@@ -1,6 +1,8 @@
 # project specific
 Data Engineering - Pre-Read.pdf
 *.db
+*.db.wal
+tests/test_resources/test_case_queries/imdb_sample_data*
 
 # PyCharm Specific
 __pycache__/
