@@ -1,0 +1,2 @@
+insert into NOTHING.NON_EXISTING_TABLE
+select * from NON_EXISTING_TABLE;
